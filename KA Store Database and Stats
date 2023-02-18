@@ -1,0 +1,20 @@
+--Create Clothing Store Database
+CREATE TABLE store (id INTEGER PRIMARY KEY, item TEXT, color TEXT, stock INTEGER, price INTEGER);
+
+INSERT INTO store VALUES
+(1, "Shirt", "Red", 3, 10);
+INSERT INTO store VALUES
+(2, "Pants", "Blue", 5, 20);
+INSERT INTO store VALUES
+(3, "Socks", "Black", 10, 5);
+INSERT INTO store VALUES
+(4, "Hat", "Orange", 4, 7);
+INSERT INTO store VALUES
+(5, "Glasses", "White", 2, 12);
+SELECT * FROM store;
+
+--Display database ordered by descending price
+Select * FROM store ORDER BY price desc;
+
+--Display the inventory value of each clothing item sold in the store in ascending order
+SELECT item, (stock*price) as total from store order by total asc
