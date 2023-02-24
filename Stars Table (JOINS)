@@ -1,0 +1,57 @@
+/* Create table about the people and what they do here */
+
+
+CREATE TABLE stars (id INTEGER PRIMARY KEY, fullname TEXT, age INTEGER, best_movie TEXT);
+
+INSERT INTO stars VALUES (1,"Leonardo Dicaprio", 45, "Shutter Island");
+INSERT INTO stars VALUES (2, "Will Smith", 40, "I am Legend");
+INSERT INTO stars VALUES (3, "Jennifer Lawrence", 35, "American Hustle");
+INSERT INTO stars VALUES (4, "Christian Bale", 55, "The Prestige");
+INSERT INTO stars VALUES (5, "Amy Adams", 38, "Arrival");
+INSERT INTO stars VALUES(6, "Tom Hanks", 60, "Castaway");
+
+
+CREATE TABLE favorites (id INTEGER PRIMARY KEY, person_id INTEGER, fav_movie TEXT, times_seen INTEGER);
+
+INSERT INTO favorites VALUES (1, 1, "Forrest Gump", 10);
+INSERT INTO favorites VALUES (2, 1, "The Incredibles", 15);
+INSERT INTO favorites VALUES (3, 2, "The Godfather", 20);
+INSERT INTO favorites VALUES (4, 2, "Goodfellas", 8);
+INSERT INTO favorites VALUES (5, 3, "Seven", 9);
+INSERT INTO favorites VALUES (6, 3, "The Matrix", 25);
+INSERT INTO favorites VALUES (7, 4, "Interstellar", 12);
+INSERT INTO favorites VALUES (8, 4, "Psycho", 23);
+INSERT INTO favorites VALUES (9, 5, "Parasite", 31);
+INSERT INTO favorites VALUES (10, 5, "Coco", 17);
+
+/** Show me a list of the stars and their favorite movies **/
+
+SELECT stars.fullname, favorites.fav_movie
+FROM stars
+JOIN favorites
+ON stars.id = favorites.person_id;
+
+/** Show me the stars and their age to compare the age to how many times they've seen their favorite movies **/
+
+SELECT stars.fullname, stars.age, favorites.fav_movie, favorites.times_seen
+FROM stars
+JOIN favorites
+ON stars.id = favorites.person_id;
+
+/** How many times has each star seen their favorite movies in total include all stars in the star table **/
+
+SELECT stars.fullname, SUM(favorites.times_seen) as total_views
+FROM stars
+LEFT JOIN favorites
+ON stars.id = favorites.person_id
+GROUP BY stars.fullname
+ORDER BY total_views asc;
+
+/** Show me each stars best movie and favorite movie, but only if they have seen that movie more than 20 times**/
+
+
+SELECT stars.fullname, stars.best_movie, favorites.fav_movie, favorites.times_seen
+FROM stars
+JOIN favorites
+ON stars.id = favorites.person_id
+WHERE favorites.times_seen >= 20
