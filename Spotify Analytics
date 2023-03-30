@@ -52,10 +52,13 @@ LIMIT 1;
 
 /**What is the average popularity of all the 10 least popular songs?**/
 
+WITH tempTable AS
+(SELECT popularity
+FROM Spotifydata
+ORDER BY popularity asc LIMIT 10)
+
 SELECT AVG(popularity)
-FROM BIT_DB.Spotifydata
-WHERE popularity
-IN (SELECT popularity FROM BIT_DB.Spotifydata ORDER BY popularity asc LIMIT 10);
+FROM tempTable;
 
 /*What is the average danceability by artist?*/
 
@@ -83,3 +86,14 @@ SELECT AVG(danceability)
 FROM BIT_DB.Spotifydata
 WHERE danceability
 IN (SELECT danceability FROM BIT_DB.Spotifydata Order by popularity desc LIMIT 10);
+
+--Calculate the average popularity for the artists in the Spotify data table. Then, for every artist with an average popularity of 90 or above, show their name, their average popularity, and label them as a “Top Star”.--
+
+WITH popularity_average_CTE AS
+(SELECT Spotifydata.artist_name, AVG(Spotifydata.popularity) as real_pop
+FROM Spotifydata
+GROUP BY artist_name)
+
+SELECT artist_name, real_pop, 'Top Star' AS tag
+FROM popularity_average_CTE
+WHERE real_pop >= 90;
