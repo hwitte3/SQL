@@ -133,3 +133,13 @@ ORDER BY invoices.Total desc LIMIT 20)
 
 SELECT AVG(TempTable.Total)
 FROM TempTable;
+
+--What is the length of each of the playlists? Show the playlist name, the tracks in the playlist and the length of each individual track.
+
+SELECT playlists.PlaylistId,playlists.Name as Playlist, tracks.Name as Track, tracks.Milliseconds as Length,
+SUM(tracks.Milliseconds) OVER (PARTITION BY playlists.PlaylistId) as Playlist_Length
+FROM chinook.playlists
+JOIN chinook.playlist_track
+ON playlists.PlaylistId = playlist_track.PlaylistId
+JOIN chinook.tracks
+ON playlist_track.TrackId = tracks.TrackId;
