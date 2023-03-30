@@ -1,0 +1,131 @@
+--Show Customers (their full names, customer ID, and country) who are not in the US
+
+SELECT  CustomerId, FirstName, LastName, Country FROM chinook.customers
+WHERE Country <> 'USA';
+
+
+--Show only the Customers from Brazil.
+
+SELECT CustomerID, FirstName, LastName, Country FROM chinook.customers
+WHERE Country = 'Brazil';
+
+/*Find the Invoices of customers who are from Brazil. The resulting table should show the customer's full name, Invoice ID, Date of the invoice, and billing country.*/
+
+SELECT customers.FirstName, customers.LastName, invoices.InvoiceId, invoices.InvoiceDate, invoices.BillingCountry
+FROM chinook.customers 
+JOIN chinook.invoices
+ON customers.CustomerId = invoices.CustomerId
+WHERE invoices.BillingCountry = 'Brazil';
+
+--Show the Employees who are Sales Agents.
+
+SELECT EmployeeId, LastName, FirstName, Title
+FROM chinook.employees
+WHERE Title LIKE '%Agent%';
+
+--Find a unique/distinct list of billing countries from the Invoice table.
+
+SELECT DISTINCT billingcountry
+FROM chinook.invoices;
+
+--Provide a query that shows the invoices associated with each sales agent.
+
+SELECT employees.LastName, employees.FirstName, invoices.InvoiceId
+FROM chinook.employees
+JOIN chinook.customers
+ON employees.employeeId = customers.SupportRepId
+JOIN chinook.invoices 
+ON customers.CustomerId = invoices.CustomerId;
+
+--Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers.
+
+SELECT invoices.Total, customers.FirstName, customers.LastName, customers.Country, employees.LastName, employees.FirstName
+FROM chinook.invoices
+JOIN chinook.customers
+ON invoices.CustomerId = customers.CustomerId
+JOIN chinook.employees
+ON customers.SupportRepId = employees.employeeId;
+
+--How many Invoices were there in 2009?
+
+SELECT COUNT(InvoiceId) as Invoices_2009
+FROM chinook.invoices
+WHERE InvoiceDate LIKE '2009%';
+
+--What are the total sales for 2009?
+
+SELECT SUM(Total)
+FROM chinook.invoices
+Where InvoiceDate LIKE '2009%';
+
+--Write a query that includes the purchased track name with each invoice line ID.
+
+SELECT invoice_items.InvoiceLineId, tracks.Name
+FROM chinook.invoice_items
+JOIN chinook.tracks
+ON invoice_items.TrackId = tracks.TrackId;
+
+--Write a query that includes the purchased track name AND artist name with each invoice line ID.
+
+SELECT artists.Name AS Artist, tracks.Name AS Track, invoice_items.InvoiceLineId
+FROM chinook.artists
+JOIN chinook.albums ON artists.ArtistID = albums.ArtistId
+JOIN chinook.tracks ON albums.AlbumId = tracks.AlbumId
+JOIN chinook.invoice_items ON tracks.TrackId = invoice_items.TrackId;
+
+--Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre.
+
+SELECT tracks.Name as Track, albums.Title as Album, media_types.Name as Media, genres.Name as Genre
+FROM chinook.tracks
+LEFT JOIN chinook.albums
+ON tracks.AlbumId = albums.AlbumId
+JOIN chinook.media_types
+ON tracks.MediaTypeId = media_types.MediaTypeId
+JOIN chinook.genres
+ON tracks.GenreId = genres.GenreId;
+
+--Show the total sales made by each sales agent.
+
+SELECT employees.FirstName, employees.LastName, ROUND(SUM(invoices.Total),2) AS 'Total Sales'
+FROM chinook.employees
+JOIN chinook.customers
+ON employees.EmployeeId = customers.SupportRepId
+JOIN chinook.invoices
+ON customers.CustomerId = invoices.CustomerId
+WHERE employees.title = 'Sales Support Agent'
+GROUP BY employees.FirstName;
+
+--Which sales agent made the most dollars in sales in 2009?
+
+SELECT employees.FirstName, employees.LastName, ROUND(SUM(invoices.Total),2) AS 'Top Salesman in 2009'
+FROM chinook.employees
+JOIN chinook.customers
+ON employees.EmployeeId = customers.SupportRepId
+JOIN chinook.invoices
+ON customers.CustomerId = invoices.CustomerId
+WHERE employees.Title = 'Sales Support Agent'
+AND invoices.InvoiceDate LIKE '2009%'
+GROUP BY employees.FirstName
+ORDER BY ROUND(SUM(invoices.Total),2) desc LIMIT 1;
+
+--What are the top 10 most purchased tracks?
+
+SELECT tracks.Name, SUM(invoice_items.Quantity) AS Purchases
+FROM chinook.tracks
+JOIN chinook.invoice_items
+ON tracks.TrackId = invoice_items.TrackId
+GROUP BY tracks.TrackId
+ORDER BY Purchases desc LIMIT 10;
+
+--Who was the last employee hired?
+
+SELECT employees.FirstName, employees.LastName, employees.HireDate
+FROM chinook.employees
+ORDER BY employees.HireDate desc LIMIT 1;
+
+--What is the average order price of the top 20 most expensive orders?
+
+SELECT ROUND(AVG(Total),2)
+FROM chinook.invoices
+WHERE invoices.Total IN(SELECT invoices.Total FROM chinook.invoices
+ORDER BY invoices.Total desc LIMIT 20);
