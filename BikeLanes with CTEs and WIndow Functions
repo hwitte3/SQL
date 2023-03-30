@@ -1,0 +1,34 @@
+SELECT * FROM BIT_DB.CityBikeLanes LIMIT 10;
+SELECT * FROM BIT_DB.CityBikeLanes WHERE street = 'Walnut';
+
+-- Your boss wants a list of all the bike lanes that have an average safety rating of 4.0 or higher. She also wants to see the average safety rating for each of those bike lanes, and a label that says "Safe Lane".--
+
+WITH safety_CTE AS
+(SELECT CityBikeLanes.street, AVG(CityBikeLanes.safetyrating) as average_rating
+FROM CityBikeLanes
+GROUP BY street)
+
+SELECT street, average_rating, 'Safe Lane' AS outcome
+FROM safety_CTE
+WHERE average_rating >=4;
+
+SELECT street, safetyrating,
+AVG(safetyrating) OVER (PARTITION BY street) as "Average_safety_rating"
+FROM CityBikeLanes;
+
+SELECT street, safetyrating,
+AVG(safetyrating) OVER (PARTITION BY street) as "Average_safety_rating"
+FROM CityBikeLanes
+WHERE street='2nd';
+
+--Show a list of all the bike lanes, both safety ratings for each lane, the average safety rating for each lane, and a label with the recommendation as "Remove", "Leave As-Is", or "Improvements Needed". Average safety rating of 4 or more = "Leave As-Is", Less than 2.5 = "Remove", All Else = "Improvements Needed"--
+
+
+SELECT street, safetyrating,
+AVG(safetyrating) OVER (PARTITION BY street) as "average_safety_rating",
+CASE
+WHEN AVG(safetyrating) OVER (PARTITION BY street) >= 4 THEN "Leave-As-Is"
+WHEN AVG(safetyrating) OVER (PARTITION BY street) < 2.5 THEN "Remove"
+ELSE "Improvements Needed"
+END AS "Recommendation"
+FROM CityBikeLanes;
