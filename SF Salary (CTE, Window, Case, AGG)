@@ -1,0 +1,47 @@
+-- SF DATABASE
+
+SELECT * FROM SF_Salary.Salaries;
+
+-- Show min, max, and average of total pay
+
+SELECT Salaries.EmployeeName, MIN(Salaries.TotalPay) FROM SF_Salary.Salaries;
+SELECT Salaries.EmployeeName, MAX(Salaries.TotalPay) FROM SF_Salary.Salaries;
+SELECT ROUND(AVG(Salaries.TotalPay),2) FROM SF_Salary.Salaries;
+
+-- Show the average base pay of the 10 highest and 10 lowest earners
+
+WITH HighPay AS
+(SELECT Salaries.BasePay 
+FROM Salaries
+WHERE BasePay <> "" AND BasePay <> 'Not Provided'
+ORDER BY BasePay DESC LIMIT 10)
+SELECT AVG(BasePay) FROM HighPay;
+
+WITH LowPay AS
+(SELECT Salaries.BasePay
+FROM Salaries
+WHERE BasePay <> "" AND BasePay <> 'Not Provided'
+ORDER BY Salaries.BasePay ASC LIMIT 10)
+SELECT AVG(BasePay) FROM LowPay;
+
+-- Categorize less than 100,000 as "Low Income", 100,000-200,000 as "Middle Income" and over 200,000 as "High Income", how many are in each (Case)
+
+SELECT COUNT(*),
+CASE
+WHEN Salaries.TotalPay < 100000 THEN "Low Income"
+WHEN Salaries.TotalPay >= 200000 THEN "High Income"
+ELSE "Middle Income"
+END AS "Bracket"
+FROM SF_Salary.Salaries
+GROUP BY Bracket;
+
+--What is the sum of total pay of all employees whose first name is "John" (Wildcards)
+
+SELECT SUM(Salaries.TotalPay) FROM SF_Salary.Salaries
+WHERE Salaries.EmployeeName = 'John%';
+
+-- Show the average base pay of like job titles (Window Function)
+
+SELECT Salaries.EmployeeName, Salaries.JobTitle, Salaries.TotalPay,
+AVG(Salaries.TotalPay) OVER (PARTITION BY Salaries.JobTitle) as "Job_Average"
+FROM SF_Salary.Salaries;
