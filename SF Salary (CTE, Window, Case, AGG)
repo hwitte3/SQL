@@ -38,7 +38,7 @@ GROUP BY Bracket;
 --What is the sum of total pay of all employees whose first name is "John" (Wildcards)
 
 SELECT SUM(Salaries.TotalPay) FROM SF_Salary.Salaries
-WHERE Salaries.EmployeeName = 'John%';
+WHERE Salaries.EmployeeName LIKE 'John%';
 
 -- Show the average base pay of like job titles (Window Function)
 
